@@ -1,0 +1,37 @@
+{
+  "name": "daremapp-ar-angular",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development"
+  },
+  "dependencies": {
+    "@angular/animations": "^21.2.0",
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/platform-browser-dynamic": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "aframe": "1.7.1",
+    "locar": "0.1.8",
+    "locar-aframe": "0.1.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^21.2.0",
+    "@angular/cli": "^21.2.0",
+    "@angular/compiler-cli": "^21.2.0",
+    "typescript": "~5.9.3"
+  },
+  "overrides": {
+    "three": "0.175.0"
+  }
+}
