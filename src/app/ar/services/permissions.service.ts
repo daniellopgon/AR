@@ -1,27 +1,38 @@
 import { Injectable } from '@angular/core';
+import { Observable, from, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
 export class PermissionsService {
 
-    async requestOrientationPermission(): Promise<boolean> {
-        const requestPermission = (DeviceOrientationEvent as any).requestPermission;
-        if (!requestPermission) return true;
+    requestOrientationPermission(): Observable<boolean> {
+        const solicitarPermiso = (DeviceOrientationEvent as any).requestPermission;
+        if (!solicitarPermiso) return of(true);
 
-        const status = await requestPermission();
-        if (status !== 'granted') throw new Error('NotAllowedError');
-
-        return true;
+        const promesaPermiso = solicitarPermiso() as Promise<string>;
+        
+        return from(promesaPermiso).pipe(
+            map(estadoPermiso => {
+                if (estadoPermiso !== 'granted') throw new Error('NotAllowedError');
+                return true;
+            }),
+            catchError(errorCapturado => throwError(() => errorCapturado))
+        );
     }
 
-    async requestCameraPermission(): Promise<boolean> {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' }
-        });
+    requestCameraPermission(): Observable<boolean> {
+        const opcionesVideo = { video: { facingMode: 'environment' } };
+        const peticionMedia = navigator.mediaDevices.getUserMedia(opcionesVideo);
 
-        stream.getTracks().forEach(track => track.stop());
-        return true;
+        return from(peticionMedia).pipe(
+            map(streamCamara => {
+                const pistas = streamCamara.getTracks();
+                pistas.forEach(pista => pista.stop());
+                return true;
+            }),
+            catchError(errorCapturado => throwError(() => errorCapturado))
+        );
     }
-
 }

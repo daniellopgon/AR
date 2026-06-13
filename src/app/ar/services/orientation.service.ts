@@ -1,12 +1,12 @@
-import { Injectable, NgZone, signal, OnDestroy, inject, computed } from '@angular/core';
-import { PermissionsService } from '../system/permissions.service';
+import { Injectable, signal, OnDestroy, inject, computed } from '@angular/core';
+import { PermissionsService } from './permissions.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class OrientationService implements OnDestroy {
     private readonly permissionsService = inject(PermissionsService);
-    private readonly ngZone = inject(NgZone);
 
     public currentHeading = 0;
 
@@ -16,21 +16,18 @@ export class OrientationService implements OnDestroy {
     private buffer: number[] = [];
     private readonly BUFFER_SIZE = 5;
     private readonly boundHandleOrientation = (event: DeviceOrientationEvent) => this.handleOrientation(event);
-    private throttleTimer: any;
     private lastUiUpdate = 0;
 
     constructor() {
         this.initOrientation();
     }
 
-    async requestPermission(): Promise<boolean> {
+    requestPermission(): Observable<boolean> {
         return this.permissionsService.requestOrientationPermission();
     }
 
     private initOrientation() {
-        this.ngZone.runOutsideAngular(() => {
-            globalThis.addEventListener('deviceorientation', this.boundHandleOrientation, true);
-        });
+        globalThis.addEventListener('deviceorientation', this.boundHandleOrientation, true);
     }
 
     private handleOrientation(event: DeviceOrientationEvent) {
@@ -75,9 +72,7 @@ export class OrientationService implements OnDestroy {
         const now = Date.now();
         if (now - this.lastUiUpdate > 1000) {
             this.lastUiUpdate = now;
-            this.ngZone.run(() => {
-                this._headingSignal.set(Math.round(this.currentHeading));
-            });
+            this._headingSignal.set(Math.round(this.currentHeading));
         }
     }
 

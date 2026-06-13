@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ArScreenComponent } from './features/ar/ar-screen.component';
+import { ArScreenComponent } from './components/ar-screen/ar-screen.component';
 
 @Component({
   selector: 'app-root',

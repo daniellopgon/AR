@@ -1,8 +1,8 @@
 import { Injectable, inject, computed, signal } from '@angular/core';
-import { GeoUtils } from '../../../core/utils/geo-utils';
-import { DEFAULT_POIS } from '../../../shared/data/default-pois';
-import { PointOfInterest, PoiView } from '../../../shared/models/poi.model';
-import { POI_CONFIG } from '../../../core/config/poi.config';
+import { GeoUtils } from '../utils/geo-utils';
+import { DEFAULT_POIS } from '../interfaces/default-pois';
+import { PointOfInterest, PoiView } from '../interfaces/poi.model';
+import { POI_CONFIG } from '../poi.config';
 import { ArStateService } from './ar-state.service';
 
 @Injectable({ providedIn: 'root' })

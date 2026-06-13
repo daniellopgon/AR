@@ -1,4 +1,4 @@
-import { AR_CONFIG } from '../../../../engine-ar/ar-config';
+import { AR_CONFIG } from '../../../engine-ar/ar-config';
 
 declare const THREE: any;
 
