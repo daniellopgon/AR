@@ -1,19 +1,24 @@
 import { Injectable, signal } from '@angular/core';
 
+// Interfaz para definir el tipo de mensaje
 export interface ToastMessage {
     id: number;
     message: string;
     type: 'success' | 'error' | 'info' | 'warning';
 }
 
+// Servicio para manejar las notificaciones
 @Injectable({
     providedIn: 'root'
 })
 export class NotificationService {
+    // Señal para manejar las notificaciones
     readonly messages = signal<ToastMessage[]>([]);
 
+    // Contador para generar los ids de las notificaciones
     private counter = 0;
 
+    // Metodos para mostrar los diferentes tipos de notificaciones
     showError(message: string) {
         this.add(message, 'error');
     }
@@ -26,6 +31,7 @@ export class NotificationService {
         this.add(message, 'info');
     }
 
+    // Metodo privado para añadir las notificaciones
     private add(message: string, type: ToastMessage['type']) {
         const id = this.counter++;
         this.messages.update(msgs => [...msgs, { id, message, type }]);

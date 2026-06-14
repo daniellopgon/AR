@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, viewChild, afterRenderEffec
 import { CommonModule } from '@angular/common';
 import { ArGraphicsComponent } from '../ar-graphics/ar-graphics.component';
 import { ArHudComponent } from '../ar-hud/ar-hud.component';
-import { PoiService } from '../../services/poi.service';
-import { PermissionsService } from '../../services/permissions.service';
+import { PoiService } from '../../services/data/poi-data.service';
+import { PermissionsService } from '../../services/infraestructure/permissions-infraestructure.service';
 import { from, EMPTY, throwError } from 'rxjs';
 import { concatMap, catchError } from 'rxjs/operators';
 
@@ -43,11 +43,10 @@ export class ArScreenComponent implements AfterViewInit {
     this.permissionsService.requestCameraPermission().pipe(
       concatMap(tienePermiso => {
         if (!tienePermiso) return throwError(() => new Error('Permiso de cámara denegado'));
-        
-        const peticionCamara = navigator.mediaDevices.getUserMedia({
+
+        return from(navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' }
-        });
-        return from(peticionCamara);
+        }));
       }),
       catchError(errorCapturado => {
         console.error('Error al iniciar la cámara:', errorCapturado);

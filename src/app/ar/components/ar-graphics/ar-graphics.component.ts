@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, ElementRef, viewChild, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ArStateService } from '../../services/ar-state.service';
+import { ArStateService } from '../../services/state/ar-state.service';
 import { AR_CONFIG } from '../../../../engine-ar/ar-config';
 
 @Component({

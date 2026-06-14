@@ -1,4 +1,4 @@
-import { PointOfInterest } from './poi.model';
+import { PointOfInterest } from '../interfaces/poi-interfaces';
 
 export const DEFAULT_POIS: PointOfInterest[] = [
     {

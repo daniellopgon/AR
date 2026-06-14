@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ArStateService } from '../../services/ar-state.service';
-import { PoiService } from '../../services/poi.service';
+import { ArStateService } from '../../services/state/ar-state.service';
+import { PoiService } from '../../services/data/poi-data.service';
 import { ToastComponent } from '../toast/toast.component';
 import { AR_TEXT } from '../../constants/ui-resources';
 
