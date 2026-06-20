@@ -7,8 +7,10 @@ import { AR_CONFIG } from '../../../../engine-ar/ar-config';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './ar-graphics.component.html',
   styleUrl: './ar-graphics.component.css',
+  // solo se actualiza si detecta cambios
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+// Componente que pinta la escena 3D de AR
 export class ArGraphicsComponent {
   protected readonly state = inject(ArStateService);
 
@@ -16,38 +18,20 @@ export class ArGraphicsComponent {
   readonly cameraRef = viewChild<ElementRef>('camera');
   readonly videoRef = viewChild<ElementRef<HTMLVideoElement>>('videoElement');
 
+  // valores de configuracion del ocluder
   protected readonly occluderConfig = `width: ${AR_CONFIG.OCCLUDER.GEOMETRY[0]}; height: ${AR_CONFIG.OCCLUDER.GEOMETRY[1]}; depth: ${AR_CONFIG.OCCLUDER.GEOMETRY[2]}`;
 
-  constructor() {
-    this.iniciarBucleSeguimiento();
-  }
-
-  private iniciarBucleSeguimiento(): void {
-    let lastY = 0;
-
-    const actualizarPosicion = () => {
-      const cameraEl = this.cameraRef()?.nativeElement;
-      const y = cameraEl?.object3D?.position?.y ?? 0;
-
-      if (Math.abs(y - lastY) > 0.05) {
-        lastY = y;
-        this.state.updateCameraHeight(y);
-      }
-
-      requestAnimationFrame(actualizarPosicion);
-    };
-
-    requestAnimationFrame(actualizarPosicion);
-  }
-
+  // muestra si la señal del gps es estable
   protected onStable(): void {
     this.state.setStabilized(true);
   }
 
+  // maneja errores de la camara
   protected onCameraError(event: any): void {
     console.error('[AR] Camera Error:', event);
   }
 
+  // asigna el stream de video a la camara
   public setVideoStream(stream: MediaStream): void {
     const video = this.videoRef()?.nativeElement;
     if (!video) return;

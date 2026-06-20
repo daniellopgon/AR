@@ -6,14 +6,14 @@ import { Injectable, signal } from '@angular/core';
 export class ArStateService {
     // señales para variables relacionadas con la AR, se actualizan solas o desde otros servicios
     readonly #isStabilized = signal(false);
-    readonly #cameraHeight = signal(0);
+
     readonly #gpsAccuracy = signal(0);
     readonly #userPosition = signal<{ lat: number; lng: number } | null>(null);
     readonly #heading = signal(0);
 
     //Variables privadas de solo lectura que se utilizan para obtener los valores de las variables privadas
     readonly isStabilized = this.#isStabilized.asReadonly();
-    readonly cameraHeight = this.#cameraHeight.asReadonly();
+
     readonly gpsAccuracy = this.#gpsAccuracy.asReadonly();
     readonly userPosition = this.#userPosition.asReadonly();
     readonly heading = this.#heading.asReadonly();
@@ -23,10 +23,6 @@ export class ArStateService {
         this.#isStabilized.set(value);
     }
 
-    // Actualizar la altura de la cámara
-    updateCameraHeight(height: number): void {
-        this.#cameraHeight.set(height);
-    }
 
     // Actualizar el accuracy del gps
     updateGpsAccuracy(accuracy: number): void {

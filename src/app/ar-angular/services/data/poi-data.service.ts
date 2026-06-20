@@ -2,7 +2,7 @@ import { Injectable, inject, computed, signal } from '@angular/core';
 import { GeoUtils } from '../../utils/geo-utils';
 import { DEFAULT_POIS } from '../../constants/default-pois';
 import { PointOfInterest, PoiView } from '../../interfaces/poi-interfaces';
-import { POI_CONFIG } from '../../poi.config';
+
 import { ArStateService } from '../state/ar-state.service';
 
 /**
@@ -12,8 +12,8 @@ import { ArStateService } from '../state/ar-state.service';
  */
 @Injectable({ providedIn: 'root' })
 export class PoiService {
-    private readonly config = inject(POI_CONFIG);
-    private readonly VISIBLE_RADIUS = this.config.visibilityRadius;
+    // Radio de visión en metros. Los POIs más lejanos no se mostrarán.
+    private readonly VISIBLE_RADIUS = 500;
     private readonly state = inject(ArStateService);
 
     /**
