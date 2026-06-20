@@ -1,0 +1,37 @@
+export class GeoUtils {
+    private static readonly R = 6371e3;
+
+    static haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        const phi1 = lat1 * Math.PI / 180;
+        const phi2 = lat2 * Math.PI / 180;
+        const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+        const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) * Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return this.R * c;
+    }
+
+    static calculateAverageHeading(headings: number[]): number {
+        if (!headings || headings.length === 0) return 0;
+
+        let sinSum = 0;
+        let cosSum = 0;
+
+        for (const h of headings) {
+            const rad = h * Math.PI / 180;
+            sinSum += Math.sin(rad);
+            cosSum += Math.cos(rad);
+        }
+
+        const avgRad = Math.atan2(sinSum / headings.length, cosSum / headings.length);
+        let avgDeg = avgRad * 180 / Math.PI;
+
+        if (avgDeg < 0) avgDeg += 360;
+
+        return avgDeg;
+    }
+}

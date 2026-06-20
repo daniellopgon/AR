@@ -1,0 +1,45 @@
+<div class="hud-container">
+  <div class="overlay">
+    <div class="badge">
+      @if (state.gpsAccuracy() > 20) {
+        <span class="bad">BUSCANDO SEÑAL...</span>
+      } @else if (state.gpsAccuracy() > 10) {
+        <span class="warning">{{ AR_TEXT.CALIBRATING }}</span>
+      } @else {
+        <span class="stable">
+          @if (state.isStabilized()) {
+            {{ AR_TEXT.STABLE }}
+          } @else {
+            CALIBRANDO...
+          }
+        </span>
+      }
+    </div>
+    <div class="stats">
+      <span>{{ AR_TEXT.GPS_ACC }}{{ state.gpsAccuracy() | number:'1.0-0' }}{{ AR_TEXT.METERS_UNIT }}</span>
+      <span>{{ AR_TEXT.CAM_Y }}{{ state.cameraHeight() | number:'1.1-1' }}{{ AR_TEXT.METERS_UNIT }}</span>
+      <span>{{ AR_TEXT.POI_COUNT }}{{ poiService.visiblePois().length }}</span>
+      <span style="color:#00e5ff">FIXES OK: {{ fixesAceptados() }}</span>
+    </div>
+
+    <div class="compass-panel">
+      <div class="compass-direction" [style.color]="compassInfo().color">
+        {{ compassInfo().symbol }} {{ compassInfo().name }}
+      </div>
+      <div class="compass-row">
+        <span>α {{ compassInfo().alpha }}°</span>
+        <span class="compass-deviation">
+          @if (compassInfo().deviationAbs < 5) {
+            <span class="ok">desv {{ compassInfo().deviation }}°</span>
+          } @else if (compassInfo().deviationAbs < 15) {
+            <span class="warn">desv {{ compassInfo().deviation }}°</span>
+          } @else {
+            <span class="bad">desv {{ compassInfo().deviation }}°</span>
+          }
+        </span>
+      </div>
+    </div>
+  </div>
+  
+  <app-toast></app-toast>
+</div>

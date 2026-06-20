@@ -1,0 +1,65 @@
+.hud-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  padding: 16px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+.overlay {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.badge {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  font-weight: bold;
+  font-size: 0.8rem;
+  backdrop-filter: blur(4px);
+}
+.bad {
+  color: #f44336; 
+}
+.warning {
+  color: #ffeb3b; 
+}
+.stable {
+  color: #4caf50; 
+}
+.stats {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-size: 0.75rem;
+  text-shadow: 1px 1px 2px black;
+}
+.compass-panel {
+  background: rgba(0,0,0,0.65);
+  border-radius: 10px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-self: flex-start;
+  backdrop-filter: blur(4px);
+}
+.compass-direction {
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+}
+.compass-row {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #ccc;
+}
+.compass-deviation .ok   { color: #4caf50; }
+.compass-deviation .warn { color: #ffeb3b; }
+.compass-deviation .bad  { color: #f44336; }

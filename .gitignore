@@ -1,28 +1,70 @@
-# Angular specific
-/dist/
-/out-tsc/
-/tmp/
-/coverage/
-/e2e/test-output/
-/.angular/
+# Dependency directories
+node_modules/
+package-lock.json
+
+# Angular build artifacts
+dist/
 .angular/
 
-# Node modules and dependency files
-/node_modules/
-/package-lock.json
-/yarn.lock
+# Build and IDE outputs
+out-tsc/
+bazel-out/
+tmp/
 
-# Environment files
-/.env
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
 
-# Angular CLI and build artefacts
-/.angular-cli.json
-/.ng/
-
-# TypeScript cache
-*.tsbuildinfo
+# AI Agents and generated content
+.agent/
+.gemini/
+.ai/
+brain/
+knowledge/
+.agent_logs/
+**/agent_history/
+**/mcp_storage/
 
 # Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Environment
+src/environments/environment.ts
+src/environments/environment.prod.ts
+src/environments/environment.development.ts
+.env
+.env.*
+
+# Mobile/Hybrid Build Artifacts
+www/
+platforms/
+plugins/
+android/app/build/
+android/.gradle/
+ios/Pods/
+ios/build/
+
+# OS specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# SSL Certificates
+*.pem
+key.pem
+cert.pem
+generate-ssl.js
+
+# SSL Generation Script
+generate-ssl.js
+
