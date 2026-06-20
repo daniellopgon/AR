@@ -1,135 +1,186 @@
+"use strict";
+
 import { AR_CONFIG } from '../ar-config';
 
+/**
+ * Sistema encargado de gestionar los marcadores en la escena y calcular su visibilidad y escala 
+ * basándose en la distancia a la cámara.
+ */
 AFRAME.registerSystem('place-marker', {
-    init: function () {
-        this.markers = [];
-        this.cameraEl = null;
-        this.lastSearch = 0;
-        this.calculateFades = AFRAME.utils.throttleTick(this.updateDistancesAndFades, 150, this);
+    /**
+     * Inicializa las variables y funciones optimizadas del sistema.
+     */
+    init() {
+        this.marcadores = [];
+        this.elementoCamara = null;
+        this.ultimaBusqueda = 0;
+        this.calcularDesvanecimientos = AFRAME.utils.throttleTick(this.actualizarDistanciasYDesvanecimientos, 150, this);
     },
 
-    registerMarker: function (marker) {
-        this.markers.push(marker);
-        console.log('[POI] Marcador añadido al sistema.');
+    /**
+     * Registra un nuevo marcador en el sistema.
+     */
+    registrarMarcador(marcador) {
+        this.marcadores.push(marcador);
+        console.info('[POI] Marcador añadido al sistema.');
     },
 
-    unregisterMarker: function (marker) {
-        const index = this.markers.indexOf(marker);
-        if (index > -1) this.markers.splice(index, 1);
-    },
-
-    getCamera: function () {
-        if (this.cameraEl) return this.cameraEl;
-
-        const now = performance.now();
-        if (now - this.lastSearch > 500) {
-            this.cameraEl = document.querySelector(AR_CONFIG.SYSTEM.LOCAR_CAMERA_SELECTOR);
-            if (this.cameraEl) console.log('[POI] Cámara vinculada a la caché.');
-            this.lastSearch = now;
+    /**
+     * Elimina un marcador del sistema.
+      */
+    desregistrarMarcador(marcador) {
+        const indice = this.marcadores.indexOf(marcador);
+        if (indice > -1) {
+            this.marcadores.splice(indice, 1);
         }
-        return this.cameraEl;
     },
 
-    tick: function (t, dt) {
-        const camera = this.getCamera();
-        if (!camera) return;
+    /**
+     * Obtiene la referencia a la cámara principal, utilizando una caché para no saturar el DOM.
+     */
+    obtenerCamara() {
+        if (this.elementoCamara !== null) {
+            return this.elementoCamara;
+        }
 
-        const camPos = camera.object3D.position;
+        const tiempoActual = performance.now();
+        if (tiempoActual - this.ultimaBusqueda > 500) {
+            this.elementoCamara = document.querySelector(AR_CONFIG.SYSTEM.LOCAR_CAMERA_SELECTOR);
+            if (this.elementoCamara !== null) {
+                console.info('[POI] Cámara vinculada a la caché.');
+            }
+            this.ultimaBusqueda = tiempoActual;
+        }
+        return this.elementoCamara;
+    },
 
-        for (let i = 0; i < this.markers.length; i++) {
-            const marker = this.markers[i];
-            const object3D = marker.el.object3D;
-            if (object3D && object3D.visible) {
-                object3D.lookAt(camPos);
+    /**
+     * Bucle principal de ejecución del sistema.
+    */
+    tick(tiempo, deltaTiempo) {
+        const camara = this.obtenerCamara();
+        if (camara === null) {
+            return;
+        }
+
+        const posicionCamara = camara.object3D.position;
+
+        for (const marcador of this.marcadores) {
+            const objeto3D = marcador.el.object3D;
+            if (objeto3D !== undefined && objeto3D !== null && objeto3D.visible === true) {
+                objeto3D.lookAt(posicionCamara);
             }
         }
 
-        this.calculateFades(t, dt);
+        this.calcularDesvanecimientos(tiempo, deltaTiempo);
     },
 
-    updateDistancesAndFades: function (t, dt) {
-        const camera = this.getCamera();
-        if (!camera) return;
-
-        if (t % 5000 < 200) {
-            console.log(`[POI] Sistema operativo. Procesando ${this.markers.length} marcadores.`);
+    /**
+     * Calcula la escala y visibilidad de cada marcador dependiendo de su distancia a la cámara.
+     */
+    actualizarDistanciasYDesvanecimientos(tiempo, deltaTiempo) {
+        const camara = this.obtenerCamara();
+        if (camara === null) {
+            return;
         }
 
-        const camPos = camera.object3D.position;
-        const fadeStart = AR_CONFIG.FADE.START;
-        const fadeEnd = AR_CONFIG.FADE.END;
-        const baseScale = AR_CONFIG.FADE.BASE_SCALE;
+        if (tiempo % 5000 < 200) {
+            console.info(`[POI] Sistema operativo. Procesando ${this.marcadores.length} marcadores.`);
+        }
 
-        for (let i = 0; i < this.markers.length; i++) {
-            const marker = this.markers[i];
-            const el = marker.el;
-            const object3D = el.object3D;
-            if (!object3D) continue;
+        const posicionCamara = camara.object3D.position;
+        const inicioDesvanecimiento = AR_CONFIG.FADE.START;
+        const finDesvanecimiento = AR_CONFIG.FADE.END;
+        const escalaBase = AR_CONFIG.FADE.BASE_SCALE;
 
-            const dist = object3D.position.distanceTo(camPos);
+        for (const marcador of this.marcadores) {
+            const elemento = marcador.el;
+            const objeto3D = elemento.object3D;
 
-            const scale = THREE.MathUtils.clamp(
-                THREE.MathUtils.mapLinear(dist, fadeStart, fadeEnd, 1, 0),
-                0, 1
-            );
-
-            if (scale <= 0.01) {
-                if (object3D.visible) object3D.visible = false;
+            if (objeto3D === undefined || objeto3D === null) {
                 continue;
             }
 
-            if (!object3D.visible && el.getAttribute('visible') !== false) {
-                object3D.visible = true;
+            const distancia = objeto3D.position.distanceTo(posicionCamara);
+
+            const escala = THREE.MathUtils.clamp(
+                THREE.MathUtils.mapLinear(distancia, inicioDesvanecimiento, finDesvanecimiento, 1, 0),
+                0, 1
+            );
+
+            if (escala <= 0.01) {
+                if (objeto3D.visible === true) {
+                    objeto3D.visible = false;
+                }
+                continue;
             }
 
-            const s = baseScale * scale;
-            object3D.scale.set(s, s, s);
+            if (objeto3D.visible === false && elemento.getAttribute('visible') !== false) {
+                objeto3D.visible = true;
+            }
 
-            if (marker.markerMesh?.material) {
-                marker.markerMesh.material.opacity = scale;
+            const escalaFinal = escalaBase * escala;
+            objeto3D.scale.set(escalaFinal, escalaFinal, escalaFinal);
+
+            if (marcador.mallaMarcador !== undefined && marcador.mallaMarcador !== null && marcador.mallaMarcador.material !== undefined) {
+                marcador.mallaMarcador.material.opacity = escala;
             }
         }
     }
 });
 
+/**
+ * Componente que representa un marcador físico en el espacio 3D.
+ */
 AFRAME.registerComponent('place-marker', {
     schema: {
         name: { type: 'string', default: AR_CONFIG.MARKER.DEFAULT_NAME },
         model: { type: 'asset' }
     },
 
-    init: function () {
-        this.markerMesh = null;
-        const el = this.el;
-        const modelUrl = this.data.model;
-        const isGltf = modelUrl?.toLowerCase().endsWith('.glb') || modelUrl?.toLowerCase().endsWith('.gltf');
+    /**
+     * Inicializa el componente y carga el modelo GLTF o una geometría por defecto.
+     */
+    init() {
+        this.mallaMarcador = null;
+        const elemento = this.el;
+        const urlModelo = this.data.model;
 
-        if (isGltf) {
-            el.setAttribute('gltf-model', modelUrl);
-            el.addEventListener('model-loaded', () => {
-                el.object3D.traverse((node) => {
-                    if (node.isMesh && !this.markerMesh) {
-                        this.markerMesh = node;
-                        this.markerMesh.material.transparent = true;
+        let esGltf = false;
+        if (urlModelo !== undefined && urlModelo !== null) {
+            const urlModeloMinusculas = urlModelo.toLowerCase();
+            esGltf = urlModeloMinusculas.endsWith('.glb') || urlModeloMinusculas.endsWith('.gltf');
+        }
+
+        if (esGltf === true) {
+            elemento.setAttribute('gltf-model', urlModelo);
+            elemento.addEventListener('model-loaded', () => {
+                elemento.object3D.traverse((nodo) => {
+                    if (nodo.isMesh === true && this.mallaMarcador === null) {
+                        this.mallaMarcador = nodo;
+                        this.mallaMarcador.material.transparent = true;
                     }
                 });
             });
         } else {
-            el.setAttribute('geometry', AR_CONFIG.MARKER.DEFAULT_GEOMETRY);
-            el.setAttribute('material', {
+            elemento.setAttribute('geometry', AR_CONFIG.MARKER.DEFAULT_GEOMETRY);
+            elemento.setAttribute('material', {
                 shader: 'flat',
-                src: modelUrl,
+                src: urlModelo,
                 transparent: true,
                 side: 'double'
             });
-            this.markerMesh = el.getObject3D('mesh');
+            this.mallaMarcador = elemento.getObject3D('mesh');
         }
 
-        el.object3D.position.y = AR_CONFIG.MARKER.HEIGHT_OFFSET;
-        this.system.registerMarker(this);
+        elemento.object3D.position.y = AR_CONFIG.MARKER.HEIGHT_OFFSET;
+        this.system.registrarMarcador(this);
     },
 
-    remove: function () {
-        this.system.unregisterMarker(this);
+    /**
+     * Función llamada cuando el componente es destruido. Lo elimina del sistema.
+     */
+    remove() {
+        this.system.desregistrarMarcador(this);
     }
 });
