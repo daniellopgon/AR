@@ -1,0 +1,21 @@
+<div class="markers-container">
+    @for (marcador of marcadoresVisibles(); track marcador.id) {
+        <div class="marker-wrapper"
+             [style.left.%]="marcador.posicionPantalla.x"
+             [style.top.%]="marcador.posicionPantalla.y"
+             [style.transform]="'translate(-50%, -50%) scale(' + marcador.escala + ')'"
+             [style.opacity]="marcador.opacidad">
+
+            <div class="marker-card">
+                <img class="marker-icon"
+                     src="assets/marcador.png"
+                     alt="Marcador de {{ marcador.label }}" />
+
+                <div class="marker-info">
+                    <span class="marker-name">{{ marcador.label }}</span>
+                    <span class="marker-distance">{{ formatearDistancia(marcador.distance) }}</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

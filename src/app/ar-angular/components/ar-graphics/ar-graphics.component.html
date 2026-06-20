@@ -1,27 +1,7 @@
-<a-scene #scene 
-         embedded 
-         vr-mode-ui="enabled: false"
-         background="transparent: true"
-         renderer="antialias: true; logarithmicDepthBuffer: true; colorManagement: true; alpha: true;"
-         stability 
-         (ar-stable)="onStable()"
-         (camera-error)="onCameraError($event)">
-
-    <video #videoElement 
-           autoplay 
-           muted 
-           playsinline 
-           style="display: none;"></video>
-
-    <a-entity #camera 
-              camera 
-              position="0 1.6 0"
-              look-controls="enabled: false"
-              locar-camera-custom>
-    </a-entity>
-
-    <a-entity [attr.visible]="state.isStabilized()">
-        <ng-content></ng-content>
-    </a-entity>
-
-</a-scene>
+<div class="camera-container">
+    <video #videoElement
+           autoplay
+           muted
+           playsinline>
+    </video>
+</div>

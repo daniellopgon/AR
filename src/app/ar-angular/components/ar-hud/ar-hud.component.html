@@ -1,29 +1,20 @@
 <div class="hud-container">
-  <div class="overlay">
-    <div class="badge">
-      @if (state.gpsAccuracy() > 20) {
-        <span class="bad">BUSCANDO SEÑAL...</span>
-      } @else if (state.gpsAccuracy() > 10) {
-        <span class="warning">{{ AR_TEXT.CALIBRATING }}</span>
-      } @else {
-        <span class="stable">
-          @if (state.isStabilized()) {
-            {{ AR_TEXT.STABLE }}
-          } @else {
-            CALIBRANDO...
-          }
-        </span>
-      }
-    </div>
-    <div class="stats">
-      <span>{{ AR_TEXT.GPS_ACC }}{{ state.gpsAccuracy() | number:'1.0-0' }}{{ AR_TEXT.METERS_UNIT }}</span>
-
-      <span>{{ AR_TEXT.POI_COUNT }}{{ poiService.visiblePois().length }}</span>
-      <span style="color:#00e5ff">FIXES OK: {{ fixesAceptados() }}</span>
+    <div class="overlay">
+        <div class="badge">
+            @if (state.gpsAccuracy() > 20) {
+                <span class="bad">BUSCANDO SEÑAL...</span>
+            } @else if (state.gpsAccuracy() > 10) {
+                <span class="warning">{{ AR_TEXT.CALIBRATING }}</span>
+            } @else {
+                <span class="stable">{{ AR_TEXT.STABLE }}</span>
+            }
+        </div>
+        <div class="stats">
+            <span>{{ AR_TEXT.GPS_ACC }}{{ state.gpsAccuracy() | number:'1.0-0' }}{{ AR_TEXT.METERS_UNIT }}</span>
+            <span>{{ AR_TEXT.POI_COUNT }}{{ poiService.visiblePois().length }}</span>
+            <span style="color:#00e5ff">GPS: {{ gpsService.activo() ? 'ACTIVO' : 'ESPERANDO...' }}</span>
+        </div>
     </div>
 
-
-  </div>
-  
-  <app-toast></app-toast>
+    <app-toast></app-toast>
 </div>
