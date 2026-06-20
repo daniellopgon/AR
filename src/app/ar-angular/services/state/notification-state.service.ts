@@ -12,8 +12,11 @@ export interface ToastMessage {
     providedIn: 'root'
 })
 export class NotificationService {
-    // Señal para manejar las notificaciones
-    readonly messages = signal<ToastMessage[]>([]);
+    // Señal privada para manejar las notificaciones
+    readonly #messages = signal<ToastMessage[]>([]);
+    
+    // Señal pública de solo lectura
+    readonly messages = this.#messages.asReadonly();
 
     // Contador para generar los ids de las notificaciones
     private counter = 0;
@@ -34,12 +37,12 @@ export class NotificationService {
     // Metodo privado para añadir las notificaciones
     private add(message: string, type: ToastMessage['type']) {
         const id = this.counter++;
-        this.messages.update(msgs => [...msgs, { id, message, type }]);
+        this.#messages.update(msgs => [...msgs, { id, message, type }]);
 
         setTimeout(() => this.remove(id), 5000);
     }
 
     remove(id: number) {
-        this.messages.update(msgs => msgs.filter(msg => msg.id !== id));
+        this.#messages.update(msgs => msgs.filter(msg => msg.id !== id));
     }
 }

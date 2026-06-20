@@ -16,8 +16,8 @@
       }
     </div>
     <div class="stats">
-      <span>{{ AR_TEXT.GPS_ACC }}{{ state.gpsAccuracy().toFixed(0) }}{{ AR_TEXT.METERS_UNIT }}</span>
-      <span>{{ AR_TEXT.CAM_Y }}{{ state.cameraHeight().toFixed(1) }}{{ AR_TEXT.METERS_UNIT }}</span>
+      <span>{{ AR_TEXT.GPS_ACC }}{{ state.gpsAccuracy() | number:'1.0-0' }}{{ AR_TEXT.METERS_UNIT }}</span>
+      <span>{{ AR_TEXT.CAM_Y }}{{ state.cameraHeight() | number:'1.1-1' }}{{ AR_TEXT.METERS_UNIT }}</span>
       <span>{{ AR_TEXT.POI_COUNT }}{{ poiService.visiblePois().length }}</span>
       <span style="color:#00e5ff">FIXES OK: {{ fixesAceptados() }}</span>
     </div>

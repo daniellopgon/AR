@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { PermissionsService } from './permissions.service';
+import { PermissionsService } from './permissions-infraestructure.service';
 import { Observable } from 'rxjs';
-import { ArStateService } from './state/ar-state.service';
-import { GeoUtils } from '../utils/geo-utils';
+import { ArStateService } from '../state/ar-state.service';
+import { GeoUtils } from '../../utils/geo-utils';
 
 // Servicio que se encarga de manejar la orientación del dispositivo, en grados
 @Injectable({
@@ -15,7 +15,7 @@ export class OrientationService implements OnDestroy {
     private readonly arStateService = inject(ArStateService);
 
     // Variable pública que almacena el rumbo actual en grados
-    public currentHeading = 0;
+    private currentHeading = 0;
     // Buffer para suavizar los temblores del sensor magnético
     private buffer: number[] = [];
     // Tamaño del buffer

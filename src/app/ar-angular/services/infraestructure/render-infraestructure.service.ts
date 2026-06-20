@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { ERROR_MESSAGES } from '../constants/ui-resources';
+import { ERROR_MESSAGES } from '../../constants/ui-resources';
 
 /**
  * Servicio de infraestructura encargado de centralizar y gestionar el bucle de renderizado 

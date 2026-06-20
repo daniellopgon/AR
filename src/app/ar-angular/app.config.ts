@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection, ErrorHandler, APP_INITIALIZER, inject } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
 
