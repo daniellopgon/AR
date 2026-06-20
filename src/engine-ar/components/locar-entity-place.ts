@@ -10,6 +10,7 @@ interface IInstanciaLocarExterna {
 interface IComponentesEntidad {
     'locar-camera-custom'?: {
         instanciaLocar?: IInstanciaLocarExterna;
+        tienePosicionInicial?: boolean;
     };
     [clave: string]: unknown;
 }
@@ -60,14 +61,15 @@ AFRAME.registerComponent('locar-entity-place', {
         this.alActualizarGps = this.aplicarCuandoLista.bind(this);
 
         const elementoLocar = this.el.sceneEl.querySelector(AR_CONFIG.SYSTEM.LOCAR_CAMERA_SELECTOR);
-        
+
         if (elementoLocar === null || elementoLocar === undefined) {
             return;
         }
 
-        this.instanciaLocar = elementoLocar.components['locar-camera-custom']?.instanciaLocar ?? null;
+        const componenteCamara = elementoLocar.components['locar-camera-custom'];
+        this.instanciaLocar = componenteCamara?.instanciaLocar ?? null;
 
-        if (this.instanciaLocar !== null && this.instanciaLocar.getLastKnownLocation() !== undefined) {
+        if (this.instanciaLocar !== null && componenteCamara?.tienePosicionInicial === true) {
             this.posicionLista = true;
             this.aplicarCoordenadasProyectadas();
             return;
@@ -75,12 +77,14 @@ AFRAME.registerComponent('locar-entity-place', {
 
         const alTenerPosicionInicial = (): void => {
             elementoLocar.removeEventListener('gps-initial-position-determined', alTenerPosicionInicial);
-            this.instanciaLocar = elementoLocar.components['locar-camera-custom']?.instanciaLocar ?? null;
-            
+
+            const camaraActualizada = elementoLocar.components['locar-camera-custom'];
+            this.instanciaLocar = camaraActualizada?.instanciaLocar ?? null;
+
             if (this.instanciaLocar === null) {
                 return;
             }
-            
+
             this.instanciaLocar.on('gpsupdate', this.alActualizarGps);
         };
 
@@ -90,10 +94,6 @@ AFRAME.registerComponent('locar-entity-place', {
     aplicarCuandoLista(this: IComponenteEntidadLocar): void {
         this.aplicarCoordenadasProyectadas();
         this.posicionLista = true;
-        
-        if (this.instanciaLocar !== null) {
-            this.instanciaLocar.off('gpsupdate', this.alActualizarGps);
-        }
     },
 
     update(this: IComponenteEntidadLocar): void {

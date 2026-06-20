@@ -32,7 +32,7 @@ export class ArScreenComponent implements AfterViewInit {
       const sceneEl = (graphicsComp as any)?.sceneRef()?.nativeElement;
       const poiManager = sceneEl?.systems?.['poi-manager'];
 
-      if (poiManager?.entityPool.size === 0) {
+      if (poiManager?.grupoEntidades?.size === 0) {
         const allPois = this.poiService.poisResource();
         poiManager.inicializarEntidades(allPois);
       }

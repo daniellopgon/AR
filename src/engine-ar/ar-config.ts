@@ -21,7 +21,7 @@ export const AR_CONFIG = {
             NEAR: '5 5 5',
             FAR: '5 5 5'
         },
-        DEFAULT_MODEL_PATH: './assets/daremapp/marcador.png'
+        DEFAULT_MODEL_PATH: 'assets/marcador.png'
     },
     SYSTEM: {
         LOCAR_CAMERA_SELECTOR: '[locar-camera-custom]',
@@ -58,7 +58,7 @@ export const AR_CONFIG = {
         METERS: 'm'
     },
     POI: {
-        DEFAULT_MODEL: './assets/daremapp/marcador.png',
+        DEFAULT_MODEL: 'assets/marcador.png',
         POLLING_INTERVAL: 3000,
         TRIGGER_DISTANCE: 20
     }

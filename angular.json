@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "daremapp-ar-angular": {
+    "ar-angular": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/daremapp-ar-angular",
+            "outputPath": "dist/ar-angular",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [],
@@ -59,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "daremapp-ar-angular:build:production"
+              "buildTarget": "ar-angular:build:production"
             },
             "development": {
-              "buildTarget": "daremapp-ar-angular:build:development"
+              "buildTarget": "ar-angular:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -21,25 +21,11 @@ interface IOpcionesGps {
     readonly gpsMinAccuracy: number;
 }
 
-interface IOpcionesOrientacion {
-    readonly smoothingFactor: number;
-    readonly orientationChangeThreshold: number;
-    readonly enablePermissionDialog: boolean;
-}
-
 interface IInstanciaLocar {
     setElevation(elevacion: number): void;
     startGps(): void;
     on(evento: string, callback: (eventoGps: IEventoGps) => void): void;
     add(malla: unknown, lon: number, lat: number): void;
-}
-
-interface IControlesOrientacion {
-    on(evento: string, callback: () => void): void;
-    connect(): void;
-    init(): void;
-    update(): void;
-    dispose(): void;
 }
 
 interface IEntidadAFrame {
@@ -53,7 +39,6 @@ interface IComponenteCamaraPersonalizada {
     el: IEntidadAFrame;
     instanciaLocar: IInstanciaLocar | null;
     tienePosicionInicial: boolean;
-    controlesOrientacion: IControlesOrientacion | null;
     init(): void;
     tick(): void;
     remove(): void;
@@ -74,7 +59,6 @@ declare const AFRAME: {
  */
 AFRAME.registerComponent('locar-camera-custom', {
     init(this: IComponenteCamaraPersonalizada): void {
-        const motorTres = AFRAME.THREE;
         const escena = this.el.sceneEl.object3D;
         const camara = this.el.getObject3D('camera');
 
@@ -89,20 +73,31 @@ AFRAME.registerComponent('locar-camera-custom', {
 
         this.instanciaLocar = new (LocAR as unknown as { LocationBased: new (escena: unknown, camara: unknown, opciones: IOpcionesGps) => IInstanciaLocar }).LocationBased(escena, camara, opcionesGps);
         this.instanciaLocar.setElevation(AR_CONFIG.GPS.ELEVATION);
-        
+
         if (this.el.components['locar-camera-custom'] !== undefined) {
             this.el.components['locar-camera-custom']['instanciaLocar'] = this.instanciaLocar;
         }
-        
+
         this.instanciaLocar.startGps();
 
         this.tienePosicionInicial = false;
 
         this.instanciaLocar.on('gpsupdate', (evento: IEventoGps): void => {
             const coordenadas = evento.position?.coords;
-            
-            if (coordenadas === undefined || evento.distMoved > 1000000) {
-                console.warn('[GPS-GUARD] Evento ignorado: Datos incompletos o distancia imposible.');
+
+            if (coordenadas !== undefined) {
+                console.info(`TU UBICACIÓN ACTUAL ES: Lat ${coordenadas.latitude}, Lng ${coordenadas.longitude}`);
+            }
+
+            const esPrimeraPosicion = this.tienePosicionInicial === false;
+
+            if (coordenadas === undefined) {
+                console.warn('[GPS-GUARD] Evento ignorado: Coordenadas indefinidas.');
+                return;
+            }
+
+            if (esPrimeraPosicion === false && evento.distMoved > 1000000) {
+                console.warn(`[GPS-GUARD] Evento ignorado: Distancia imposible (${evento.distMoved}m).`);
                 return;
             }
 
@@ -112,26 +107,6 @@ AFRAME.registerComponent('locar-camera-custom', {
             console.info(`[LocAR OUT] ACEPTADO Dist: ${evento.distMoved.toFixed(2)}m | Lat ${latitudFiltrada}, Lon ${longitudFiltrada}`);
 
             if (this.tienePosicionInicial === false) {
-                const cajasCalibracion = [
-                    { latDis: 0.0005, lonDis: 0, color: 0xff0000 },
-                    { latDis: -0.0005, lonDis: 0, color: 0xffff00 },
-                    { latDis: 0, lonDis: -0.0005, color: 0x00ffff },
-                    { latDis: 0, lonDis: 0.0005, color: 0x00ff00 },
-                ];
-
-                const geometria = new motorTres.BoxGeometry(10, 10, 10);
-
-                for (const caja of cajasCalibracion) {
-                    const malla = new motorTres.Mesh(
-                        geometria,
-                        new motorTres.MeshBasicMaterial({ color: caja.color })
-                    );
-                    
-                    if (this.instanciaLocar !== null) {
-                        this.instanciaLocar.add(malla, longitudFiltrada + caja.lonDis, latitudFiltrada + caja.latDis);
-                    }
-                }
-
                 this.el.emit('gps-initial-position-determined', evento);
                 this.tienePosicionInicial = true;
             }
@@ -141,7 +116,7 @@ AFRAME.registerComponent('locar-camera-custom', {
                 if (coordsFinales === undefined) {
                     return;
                 }
-                
+
                 globalThis.dispatchEvent(new CustomEvent(AR_CONFIG.EVENTS.GPS_UPDATE, {
                     detail: {
                         distMoved: evento.distMoved,
@@ -152,34 +127,14 @@ AFRAME.registerComponent('locar-camera-custom', {
                 }));
             });
         });
-
-        const opcionesOrientacion: IOpcionesOrientacion = {
-            smoothingFactor: AR_CONFIG.ORIENTATION.SMOOTHING_FACTOR,
-            orientationChangeThreshold: AR_CONFIG.ORIENTATION.CHANGE_THRESHOLD,
-            enablePermissionDialog: AR_CONFIG.ORIENTATION.ENABLE_PERMISSION_DIALOG
-        };
-
-        this.controlesOrientacion = new (LocAR as unknown as { DeviceOrientationControls: new (camara: unknown, opciones: IOpcionesOrientacion) => IControlesOrientacion }).DeviceOrientationControls(camara, opcionesOrientacion);
-
-        this.controlesOrientacion.on('deviceorientationgranted', () => {
-            if (this.controlesOrientacion !== null) {
-                this.controlesOrientacion.connect();
-            }
-        });
-
-        this.controlesOrientacion.init();
     },
 
     tick(this: IComponenteCamaraPersonalizada): void {
-        if (this.controlesOrientacion !== null && this.controlesOrientacion !== undefined) {
-            this.controlesOrientacion.update();
-        }
+        // La cámara es completamente estática 
     },
 
     remove(this: IComponenteCamaraPersonalizada): void {
-        if (this.controlesOrientacion !== null && this.controlesOrientacion !== undefined) {
-            this.controlesOrientacion.dispose();
-        }
+        // Nada que limpiar aquí
     },
 
     add(this: IComponenteCamaraPersonalizada, objeto: unknown, longitud: number, latitud: number): void {

@@ -15,7 +15,7 @@ AFRAME.registerSystem('stability', {
         this.elementoCamara = document.querySelector(AR_CONFIG.SYSTEM.LOOK_AT_TARGET);
 
         this.alActualizarGps = (evento) => { 
-            this.ultimaPrecision = evento.detail.position.coords.accuracy; 
+            this.ultimaPrecision = evento.detail.accuracy; 
         };
         
         globalThis.addEventListener(AR_CONFIG.EVENTS.GPS_UPDATE, this.alActualizarGps);
@@ -36,6 +36,10 @@ AFRAME.registerSystem('stability', {
      * Comprueba si la altura de la cámara y la precisión del GPS cumplen los requisitos mínimos.
      */
     comprobarEstabilidad() {
+        if (this.elementoCamara === null || this.elementoCamara.object3D === undefined) {
+            return;
+        }
+
         const alturaCamara = this.elementoCamara.object3D.position.y;
 
         if (alturaCamara > AR_CONFIG.STABILITY.Y_MIN && this.ultimaPrecision < AR_CONFIG.STABILITY.ACCURACY_MAX) {

@@ -27,9 +27,9 @@ AFRAME.registerSystem('poi-manager', {
 
             const entidad = document.createElement('a-entity');
             entidad.setAttribute('id', idEntidad);
-            
+
             const longitudPunto = punto.lng !== undefined ? punto.lng : punto.lon;
-            
+
             entidad.setAttribute(AR_CONFIG.COMPONENTS.LOCAR_PLACE, {
                 latitude: punto.lat,
                 longitude: longitudPunto
@@ -74,6 +74,7 @@ AFRAME.registerSystem('poi-manager', {
         for (const [id, entidad] of this.grupoEntidades) {
             if (entidad.object3D !== undefined && entidad.object3D !== null) {
                 entidad.object3D.visible = false;
+                entidad.setAttribute('visible', false);
             }
         }
 
@@ -83,6 +84,7 @@ AFRAME.registerSystem('poi-manager', {
 
             if (entidad !== undefined && entidad !== null && entidad.object3D !== undefined && entidad.object3D !== null) {
                 entidad.object3D.visible = true;
+                entidad.setAttribute('visible', true);
             }
         }
     }
