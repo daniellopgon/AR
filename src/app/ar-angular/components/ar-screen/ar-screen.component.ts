@@ -34,7 +34,7 @@ export class ArScreenComponent implements AfterViewInit {
 
       if (poiManager?.entityPool.size === 0) {
         const allPois = this.poiService.poisResource();
-        poiManager.initializeEntities(allPois);
+        poiManager.inicializarEntidades(allPois);
       }
     }, 100);
   }
@@ -77,6 +77,6 @@ export class ArScreenComponent implements AfterViewInit {
     if (!sceneEl) return;
 
     const poiManager = sceneEl.systems['poi-manager'];
-    poiManager?.setMarkers(pois);
+    poiManager?.establecerMarcadores(pois);
   }
 }

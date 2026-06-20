@@ -1,27 +1,46 @@
+"use strict";
+
 import { AR_CONFIG } from '../ar-config';
 
+/**
+ * Sistema que evalúa la estabilidad inicial de la cámara AR basándose en su altura y precisión GPS.
+ */
 AFRAME.registerSystem('stability', {
-    init: function () {
-        this.isStable = false;
-        this.lastAccuracy = 999;
-        this.cameraEl = document.querySelector(AR_CONFIG.SYSTEM.LOOK_AT_TARGET);
+    /**
+     * Inicializa el estado y los eventos del sistema de estabilidad.
+     */
+    init() {
+        this.esEstable = false;
+        this.ultimaPrecision = 999;
+        this.elementoCamara = document.querySelector(AR_CONFIG.SYSTEM.LOOK_AT_TARGET);
 
-        this.onGpsUpdate = (e) => { this.lastAccuracy = e.detail.position.coords.accuracy; };
-        globalThis.addEventListener(AR_CONFIG.EVENTS.GPS_UPDATE, this.onGpsUpdate);
+        this.alActualizarGps = (evento) => { 
+            this.ultimaPrecision = evento.detail.position.coords.accuracy; 
+        };
+        
+        globalThis.addEventListener(AR_CONFIG.EVENTS.GPS_UPDATE, this.alActualizarGps);
     },
 
-    tick: function () {
-        if (this.isStable || !this.cameraEl) return;
+    /**
+     * Bucle de ejecución constante que verifica la estabilidad hasta que se consigue.
+     */
+    tick() {
+        if (this.esEstable === true || this.elementoCamara === null) {
+            return;
+        }
 
-        this.checkStability();
+        this.comprobarEstabilidad();
     },
 
-    checkStability: function () {
-        const y = this.cameraEl.object3D.position.y;
+    /**
+     * Comprueba si la altura de la cámara y la precisión del GPS cumplen los requisitos mínimos.
+     */
+    comprobarEstabilidad() {
+        const alturaCamara = this.elementoCamara.object3D.position.y;
 
-        if (y > AR_CONFIG.STABILITY.Y_MIN && this.lastAccuracy < AR_CONFIG.STABILITY.ACCURACY_MAX) {
-            this.isStable = true;
-            globalThis.removeEventListener(AR_CONFIG.EVENTS.GPS_UPDATE, this.onGpsUpdate);
+        if (alturaCamara > AR_CONFIG.STABILITY.Y_MIN && this.ultimaPrecision < AR_CONFIG.STABILITY.ACCURACY_MAX) {
+            this.esEstable = true;
+            globalThis.removeEventListener(AR_CONFIG.EVENTS.GPS_UPDATE, this.alActualizarGps);
             this.el.emit('ar-stable');
         }
     }

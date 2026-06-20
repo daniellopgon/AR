@@ -1,68 +1,89 @@
+"use strict";
+
 import { AR_CONFIG } from '../ar-config';
 
+/**
+ * Sistema que administra la creación, actualización y visibilidad de los puntos de interés en la escena.
+ */
 AFRAME.registerSystem('poi-manager', {
-    init: function () {
-        this.pois = [];
-        this.entityPool = new Map();
+    /**
+     * Inicializa las propiedades del sistema.
+     */
+    init() {
+        this.puntosDeInteres = [];
+        this.grupoEntidades = new Map();
     },
 
-    initializeEntities: function (allPois) {
-        const scene = this.el;
+    /**
+     * Crea e inicializa las entidades 3D para todos los puntos de interés.
+     * @param {Array} todosLosPuntos - Arreglo con los datos de todos los puntos de interés.
+     */
+    inicializarEntidades(todosLosPuntos) {
+        const escena = this.el;
 
-        allPois.forEach((poi) => {
-            console.log(`%c[MOVIL POI] ${poi.name}: ${poi.lat.toFixed(6)}, ${poi.lng.toFixed(6)}`, "color: cyan");
-            const id = `poi-${poi.name}`;
+        for (const punto of todosLosPuntos) {
+            console.info(`%c[MOVIL POI] ${punto.name}: ${punto.lat.toFixed(6)}, ${punto.lng.toFixed(6)}`, "color: cyan");
+            const idEntidad = `poi-${punto.name}`;
 
-            const entity = document.createElement('a-entity');
-            entity.setAttribute('id', id);
-            entity.setAttribute(AR_CONFIG.COMPONENTS.LOCAR_PLACE, {
-                latitude: poi.lat,
-                longitude: poi.lng || poi.lon
+            const entidad = document.createElement('a-entity');
+            entidad.setAttribute('id', idEntidad);
+            
+            const longitudPunto = punto.lng !== undefined ? punto.lng : punto.lon;
+            
+            entidad.setAttribute(AR_CONFIG.COMPONENTS.LOCAR_PLACE, {
+                latitude: punto.lat,
+                longitude: longitudPunto
             });
-            entity.setAttribute(AR_CONFIG.COMPONENTS.MARKER, {
-                name: poi.name,
+            entidad.setAttribute(AR_CONFIG.COMPONENTS.MARKER, {
+                name: punto.name,
                 model: AR_CONFIG.POI.DEFAULT_MODEL
             });
-            entity.setAttribute('scale', AR_CONFIG.MARKER.SCALE.NEAR);
-            entity.setAttribute('visible', false);
+            entidad.setAttribute('scale', AR_CONFIG.MARKER.SCALE.NEAR);
+            entidad.setAttribute('visible', false);
 
-            scene.appendChild(entity);
-            this.entityPool.set(id, entity);
-        });
+            escena.appendChild(entidad);
+            this.grupoEntidades.set(idEntidad, entidad);
+        }
     },
 
-
-    setMarkers: function (pois) {
+    /**
+     * Establece los puntos de interés que deben estar activos y actualiza su visibilidad.
+     * @param {Array} puntosNuevos - Lista de puntos que deben ser gestionados.
+     */
+    establecerMarcadores(puntosNuevos) {
         console.group('[POI-MANAGER] Recibido setMarkers');
-        this.pois = pois;
-        this.updateVisibility();
+        this.puntosDeInteres = puntosNuevos;
+        this.actualizarVisibilidad();
         console.groupEnd();
     },
 
-    updateVisibility: function () {
-        const scene = this.el;
-        const allMarkers = scene.querySelectorAll('a-entity[place-marker]');
+    /**
+     * Actualiza la visibilidad de las entidades 3D basándose en la lista actual de puntos de interés.
+     */
+    actualizarVisibilidad() {
+        const escena = this.el;
+        const todosLosMarcadores = escena.querySelectorAll('a-entity[place-marker]');
 
-        allMarkers.forEach((marker) => {
-            const markerId = marker.getAttribute('id');
-            if (!this.entityPool.has(markerId)) {
-                marker.remove();
+        for (const marcador of todosLosMarcadores) {
+            const idMarcador = marcador.getAttribute('id');
+            if (this.grupoEntidades.has(idMarcador) === false) {
+                marcador.remove();
             }
-        });
+        }
 
-        this.entityPool.forEach((entity, id) => {
-            if (entity.object3D) {
-                entity.object3D.visible = false;
+        for (const [id, entidad] of this.grupoEntidades) {
+            if (entidad.object3D !== undefined && entidad.object3D !== null) {
+                entidad.object3D.visible = false;
             }
-        });
+        }
 
-        this.pois.forEach((poi) => {
-            const id = `poi-${poi.name}`;
-            const entity = this.entityPool.get(id);
+        for (const punto of this.puntosDeInteres) {
+            const idEntidad = `poi-${punto.name}`;
+            const entidad = this.grupoEntidades.get(idEntidad);
 
-            if (entity && entity.object3D) {
-                entity.object3D.visible = true;
+            if (entidad !== undefined && entidad !== null && entidad.object3D !== undefined && entidad.object3D !== null) {
+                entidad.object3D.visible = true;
             }
-        });
+        }
     }
 });
