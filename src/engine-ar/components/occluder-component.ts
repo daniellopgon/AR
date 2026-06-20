@@ -1,6 +1,8 @@
-"use strict";
-
 import { AR_CONFIG } from '../ar-config';
+import { IOccluderComponent } from '../interfaces';
+
+declare const AFRAME: any;
+declare const THREE: any;
 
 /**
  * Componente que crea una malla invisible que esconde otros objetos 3D.
@@ -15,14 +17,14 @@ AFRAME.registerComponent(AR_CONFIG.COMPONENTS.OCCLUDER, {
     /**
      * Inicializa el componente.
      */
-    init() {
+    init(this: IOccluderComponent): void {
         this.crearMallaOcultadora();
     },
 
     /**
      * Crea y aplica la geometría y el material que actúan como oclusor.
      */
-    crearMallaOcultadora() {
+    crearMallaOcultadora(this: IOccluderComponent): void {
         const geometria = new THREE.BoxGeometry(this.data.width, this.data.height, this.data.depth);
         const material = new THREE.MeshBasicMaterial({ colorWrite: false });
         const malla = new THREE.Mesh(geometria, material);

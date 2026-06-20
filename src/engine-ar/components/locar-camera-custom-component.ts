@@ -1,49 +1,11 @@
 import * as LocAR from 'locar';
 import { AR_CONFIG } from '../ar-config';
-
-interface IGpsCoords {
-    readonly latitude: number;
-    readonly longitude: number;
-    readonly accuracy: number;
-}
-
-interface IPosicionGps {
-    readonly coords?: IGpsCoords;
-}
-
-interface IEventoGps {
-    readonly position?: IPosicionGps;
-    readonly distMoved: number;
-}
-
-interface IOpcionesGps {
-    readonly gpsMinDistance: number;
-    readonly gpsMinAccuracy: number;
-}
-
-interface IInstanciaLocar {
-    setElevation(elevacion: number): void;
-    startGps(): void;
-    on(evento: string, callback: (eventoGps: IEventoGps) => void): void;
-    add(malla: unknown, lon: number, lat: number): void;
-}
-
-interface IEntidadAFrame {
-    sceneEl: { object3D: unknown };
-    getObject3D(nombre: string): unknown;
-    components: Record<string, Record<string, unknown>>;
-    emit(nombreEvento: string, datos?: unknown): void;
-}
-
-interface IComponenteCamaraPersonalizada {
-    el: IEntidadAFrame;
-    instanciaLocar: IInstanciaLocar | null;
-    tienePosicionInicial: boolean;
-    init(): void;
-    tick(): void;
-    remove(): void;
-    add(objeto: unknown, longitud: number, latitud: number): void;
-}
+import {
+    IEventoGps,
+    IOpcionesGps,
+    IInstanciaLocar,
+    IComponenteCamaraPersonalizada
+} from '../interfaces';
 
 declare const AFRAME: {
     registerComponent: (nombre: string, definicion: unknown) => void;
@@ -96,8 +58,9 @@ AFRAME.registerComponent('locar-camera-custom', {
                 return;
             }
 
-            if (esPrimeraPosicion === false && evento.distMoved > 1000000) {
-                console.warn(`[GPS-GUARD] Evento ignorado: Distancia imposible (${evento.distMoved}m).`);
+            // Filtro para ignorar saltos bruscos del GPS
+            if (esPrimeraPosicion === false && evento.distMoved > 100) {
+                console.warn(`[GPS-GUARD] Evento ignorado: Distancia anormal o salto GPS (${evento.distMoved}m).`);
                 return;
             }
 
@@ -128,18 +91,4 @@ AFRAME.registerComponent('locar-camera-custom', {
             });
         });
     },
-
-    tick(this: IComponenteCamaraPersonalizada): void {
-        // La cámara es completamente estática 
-    },
-
-    remove(this: IComponenteCamaraPersonalizada): void {
-        // Nada que limpiar aquí
-    },
-
-    add(this: IComponenteCamaraPersonalizada, objeto: unknown, longitud: number, latitud: number): void {
-        if (this.instanciaLocar !== null && this.instanciaLocar !== undefined) {
-            this.instanciaLocar.add(objeto, longitud, latitud);
-        }
-    }
 });
