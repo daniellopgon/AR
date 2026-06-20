@@ -1,46 +1,10 @@
 import { AR_CONFIG } from '../ar-config';
-
-interface IInstanciaLocarExterna {
-    getLastKnownLocation(): unknown;
-    on(evento: string, callback: () => void): void;
-    off(evento: string, callback: () => void): void;
-    lonLatToWorldCoords(longitud: number, latitud: number): [number, number] | null;
-}
-
-interface IComponentesEntidad {
-    'locar-camera-custom'?: {
-        instanciaLocar?: IInstanciaLocarExterna;
-        tienePosicionInicial?: boolean;
-    };
-    [clave: string]: unknown;
-}
-
-interface IElementoLocar extends Element {
-    components: IComponentesEntidad;
-}
-
-interface IComponenteEntidadLocar {
-    el: {
-        sceneEl: {
-            querySelector(selector: string): IElementoLocar | null;
-        };
-        object3D: {
-            position: {
-                y: number;
-                set(x: number, y: number, z: number): void;
-            };
-        };
-    };
-    data: {
-        latitude: number;
-        longitude: number;
-    };
-    posicionLista: boolean;
-    instanciaLocar: IInstanciaLocarExterna | null;
-    alActualizarGps: () => void;
-    aplicarCoordenadasProyectadas(): void;
-    aplicarCuandoLista(): void;
-}
+import {
+    IInstanciaLocarExterna,
+    IComponentesEntidad,
+    IElementoLocar,
+    IComponenteEntidadLocar
+} from '../interfaces';
 
 declare const AFRAME: {
     registerComponent: (nombre: string, definicion: unknown) => void;

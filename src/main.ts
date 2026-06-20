@@ -8,13 +8,13 @@ navigator.geolocation.watchPosition = function (success: PositionCallback, error
 
 import 'aframe';
 import 'locar';
-import './engine-ar/components/locar-camera-custom';
-import './engine-ar/components/locar-entity-place';
+import './engine-ar/components/locar-camera-custom-component';
+import './engine-ar/components/locar-entity-place-component';
 
-import './engine-ar/components/place-marker.js';
-import './engine-ar/components/occluder-component.js';
-import './engine-ar/systems/stability-system.js';
-import './engine-ar/systems/poi-manager.js';
+import './engine-ar/components/place-marker-component';
+import './engine-ar/components/occluder-component';
+import './engine-ar/systems/stability-system';
+import './engine-ar/systems/poi-manager-system';
 
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/ar-angular/app.config';

@@ -9,6 +9,7 @@ import { NotificationService } from '../../services/state/notification-state.ser
   styleUrl: './toast.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+// Componente que muestra los mensajes de error y notificaciones
 export class ToastComponent {
   protected readonly notificationService = inject(NotificationService);
 }

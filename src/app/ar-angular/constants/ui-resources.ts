@@ -1,3 +1,4 @@
+// Textos para la interfaz de usuario
 export const AR_TEXT = {
     LOADING_GPS: 'Esperando señal GPS...',
     GPS_ACTIVE: 'GPS Activo',

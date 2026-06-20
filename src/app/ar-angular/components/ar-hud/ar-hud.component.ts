@@ -12,6 +12,8 @@ import { AR_TEXT } from '../../constants/ui-resources';
   styleUrl: './ar-hud.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+// Componente encargado de pintar los valores informativos de la app como el accuracy o
+// los fixes
 export class ArHudComponent {
   protected readonly state = inject(ArStateService);
   protected readonly poiService = inject(PoiService);

@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, DestroyRef, inject } from '@angular/core';
 import { ERROR_MESSAGES } from '../../constants/ui-resources';
 
 /**
@@ -10,7 +10,15 @@ import { ERROR_MESSAGES } from '../../constants/ui-resources';
 @Injectable({
     providedIn: 'root'
 })
-export class RenderLoopService implements OnDestroy {
+export class RenderLoopService {
+    private readonly destroyRef = inject(DestroyRef);
+
+    constructor() {
+        this.destroyRef.onDestroy(() => {
+            this.stopLoop();
+            this.callbacks.clear();
+        });
+    }
     // Colección única para evitar que la misma función de animación se registre duplicada
     private readonly callbacks = new Set<FrameRequestCallback>();
 
@@ -85,12 +93,5 @@ export class RenderLoopService implements OnDestroy {
         }
     }
 
-    /**
-     * Método del ciclo de vida de Angular.
-     * Garantiza una limpieza total de memoria y detiene el motor si el servicio es destruido.
-     */
-    ngOnDestroy(): void {
-        this.stopLoop();
-        this.callbacks.clear();
-    }
+
 }

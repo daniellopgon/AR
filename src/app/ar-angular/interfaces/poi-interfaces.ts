@@ -15,3 +15,14 @@ export interface PoiView extends PointOfInterest {
         readonly y: number;
     };
 }
+
+export interface PoiManagerSystem {
+  grupoEntidades?: Set<unknown>;
+  inicializarEntidades: (pois: unknown) => void;
+  establecerMarcadores: (pois: unknown[]) => void;
+}
+
+export interface AFrameSceneElement extends HTMLElement {
+  hasLoaded: boolean;
+  systems: Record<string, PoiManagerSystem>;
+}

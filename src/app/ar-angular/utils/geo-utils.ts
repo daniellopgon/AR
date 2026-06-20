@@ -14,24 +14,4 @@ export class GeoUtils {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return this.R * c;
     }
-
-    static calculateAverageHeading(headings: number[]): number {
-        if (!headings || headings.length === 0) return 0;
-
-        let sinSum = 0;
-        let cosSum = 0;
-
-        for (const h of headings) {
-            const rad = h * Math.PI / 180;
-            sinSum += Math.sin(rad);
-            cosSum += Math.cos(rad);
-        }
-
-        const avgRad = Math.atan2(sinSum / headings.length, cosSum / headings.length);
-        let avgDeg = avgRad * 180 / Math.PI;
-
-        if (avgDeg < 0) avgDeg += 360;
-
-        return avgDeg;
-    }
 }

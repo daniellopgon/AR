@@ -1,5 +1,6 @@
-import { PointOfInterest } from '../../models/poi.interface';
+import { PointOfInterest } from '../interfaces/poi-interfaces';
 
+// Coordenadas de pois
 export const DEFAULT_POIS: PointOfInterest[] = [
     {
         name: 'Punto 1',

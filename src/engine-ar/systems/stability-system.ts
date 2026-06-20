@@ -1,6 +1,7 @@
-"use strict";
-
 import { AR_CONFIG } from '../ar-config';
+import { IStabilitySystem } from '../interfaces';
+
+declare const AFRAME: any;
 
 /**
  * Sistema que evalúa la estabilidad inicial de la cámara AR basándose en su altura y precisión GPS.
@@ -9,12 +10,12 @@ AFRAME.registerSystem('stability', {
     /**
      * Inicializa el estado y los eventos del sistema de estabilidad.
      */
-    init() {
+    init(this: IStabilitySystem): void {
         this.esEstable = false;
         this.ultimaPrecision = 999;
         this.elementoCamara = document.querySelector(AR_CONFIG.SYSTEM.LOOK_AT_TARGET);
 
-        this.alActualizarGps = (evento) => { 
+        this.alActualizarGps = (evento: any) => { 
             this.ultimaPrecision = evento.detail.accuracy; 
         };
         
@@ -24,7 +25,7 @@ AFRAME.registerSystem('stability', {
     /**
      * Bucle de ejecución constante que verifica la estabilidad hasta que se consigue.
      */
-    tick() {
+    tick(this: IStabilitySystem): void {
         if (this.esEstable === true || this.elementoCamara === null) {
             return;
         }
@@ -35,7 +36,7 @@ AFRAME.registerSystem('stability', {
     /**
      * Comprueba si la altura de la cámara y la precisión del GPS cumplen los requisitos mínimos.
      */
-    comprobarEstabilidad() {
+    comprobarEstabilidad(this: IStabilitySystem): void {
         if (this.elementoCamara === null || this.elementoCamara.object3D === undefined) {
             return;
         }
