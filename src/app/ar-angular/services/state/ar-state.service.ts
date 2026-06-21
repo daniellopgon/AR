@@ -6,7 +6,6 @@ import { Injectable, signal } from '@angular/core';
 export class ArStateService {
     // señales para variables relacionadas con la AR, se actualizan solas o desde otros servicios
     readonly #isStabilized = signal(false);
-
     readonly #gpsAccuracy = signal(0);
     readonly #userPosition = signal<{ lat: number; lng: number } | null>(null);
     readonly #heading = signal(0);
@@ -22,7 +21,6 @@ export class ArStateService {
     setStabilized(value: boolean): void {
         this.#isStabilized.set(value);
     }
-
 
     // Actualizar el accuracy del gps
     updateGpsAccuracy(accuracy: number): void {

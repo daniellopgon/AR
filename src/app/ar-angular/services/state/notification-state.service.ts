@@ -14,7 +14,7 @@ export interface ToastMessage {
 export class NotificationService {
     // Señal privada para manejar las notificaciones
     readonly #messages = signal<ToastMessage[]>([]);
-    
+
     // Señal pública de solo lectura
     readonly messages = this.#messages.asReadonly();
 

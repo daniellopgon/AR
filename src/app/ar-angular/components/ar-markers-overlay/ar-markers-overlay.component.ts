@@ -1,44 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, effect, signal } from '@angular/core';
 import { PoiService } from '../../services/data/poi-data.service';
-import { PoiView } from '../../interfaces/poi-interfaces';
+import { calcularEscala, calcularOpacidad, DISTANCIA_ABRIR_LIBRO } from '../../utils/geo-utils';
 
-/** Distancia en metros a la que el marcador tiene tamaño máximo */
-const DISTANCIA_ESCALA_MINIMA = 5;
-
-/** Distancia en metros a la que el marcador desaparece */
-const DISTANCIA_ESCALA_MAXIMA = 200;
-
-/** Escala mínima del marcador (lejano) */
-const ESCALA_MINIMA = 0.3;
-
-/** Escala máxima del marcador (cercano) */
-const ESCALA_MAXIMA = 1.5;
 
 /**
- * Calcula el factor de escala de un marcador según su distancia GPS.
- */
-const calcularEscala = (distancia: number): number => {
-    const distanciaClamped = Math.max(DISTANCIA_ESCALA_MINIMA, Math.min(distancia, DISTANCIA_ESCALA_MAXIMA));
-    const rango = DISTANCIA_ESCALA_MAXIMA - DISTANCIA_ESCALA_MINIMA;
-    const progreso = (distanciaClamped - DISTANCIA_ESCALA_MINIMA) / rango;
-    return ESCALA_MAXIMA - progreso * (ESCALA_MAXIMA - ESCALA_MINIMA);
-};
-
-/**
- * Calcula la opacidad del marcador según su distancia GPS.
- */
-const calcularOpacidad = (distancia: number): number => {
-    const umbralInicio = DISTANCIA_ESCALA_MAXIMA * 0.7;
-    if (distancia < umbralInicio) {
-        return 1;
-    }
-    const progreso = (distancia - umbralInicio) / (DISTANCIA_ESCALA_MAXIMA - umbralInicio);
-    return Math.max(0.2, 1 - progreso);
-};
-
-/**
- * Componente que renderiza los marcadores POI como overlays HTML
- * superpuestos al feed de cámara, simulando AR.
+ * Componente que renderiza el POI más cercano como un libro 3D interactivo.
  */
 @Component({
     selector: 'app-ar-markers-overlay',
@@ -49,63 +15,105 @@ const calcularOpacidad = (distancia: number): number => {
 })
 export class ArMarkersOverlayComponent {
     private readonly poiService = inject(PoiService);
+    private ultimoLibroAbiertoId: string | null = null;
+
+    // Estado de la firma
+    readonly haFirmado = signal<boolean>(false);
+    readonly firmaActual = signal<string>('');
+
+    // Estado para fijar el libro y animar su desaparición
+    readonly marcadorFijado = signal<any | null>(null);
+    readonly desvaneciendo = signal<boolean>(false);
+
+    constructor() {
+        // Efecto reactivo que observa cuándo el marcador se abre para reproducir el sonido y fijarlo
+        effect(() => {
+            if (this.marcadorFijado()) return;
+
+            const marcador = this.marcadorEnVista();
+
+            // Si no hay marcador en vista, reseteamos el ID
+            if (!marcador) {
+                this.ultimoLibroAbiertoId = null;
+                return;
+            }
+
+            // Si hay marcador pero no está abierto
+            if (!marcador.isOpen) {
+                if (this.ultimoLibroAbiertoId === marcador.id) {
+                    this.ultimoLibroAbiertoId = null;
+                }
+                return;
+            }
+
+            // Si llegamos aquí, el marcador existe y acaba de abrirse
+            this.marcadorFijado.set(marcador);
+
+            if (this.ultimoLibroAbiertoId !== marcador.id) {
+                this.ultimoLibroAbiertoId = marcador.id;
+                this.#reproducirSonidoApertura();
+            }
+        }, { allowSignalWrites: true });
+    }
 
     /**
-     * Señal computada con los marcadores visibles y sus estilos calculados.
+     * Señal computada que evalúa el marcador más cercano y su distancia.
      */
-    protected readonly marcadoresVisibles = computed(() => {
-        const pois = this.poiService.poisWithDistance();
-        const visibles = pois.filter(poi => poi.isVisible);
+    protected readonly marcadorEnVista = computed(() => {
+        const visibles = this.poiService.visiblePois();
+        const masCercano = visibles[0] ?? null;
 
-        return visibles.map((poi, indice) => ({
-            ...poi,
-            escala: calcularEscala(poi.distance),
-            opacidad: calcularOpacidad(poi.distance),
-            posicionPantalla: this.#calcularPosicionPantalla(indice, visibles.length)
-        }));
+        if (!masCercano) return null;
+
+        return {
+            ...masCercano,
+            escala: calcularEscala(masCercano.distance),
+            opacidad: calcularOpacidad(masCercano.distance),
+            isOpen: masCercano.distance <= DISTANCIA_ABRIR_LIBRO
+        };
     });
 
     /**
-     * Distribuye marcadores en la pantalla para que no se solapen.
+     * Señal computada final que la vista consume.
+     * Si el libro está fijado, mantiene sus valores estables al máximo.
      */
-    #calcularPosicionPantalla(indice: number, total: number): { x: number; y: number } {
-        if (total === 1) {
-            return { x: 50, y: 50 };
+    protected readonly marcadorCercano = computed(() => {
+        const fijado = this.marcadorFijado();
+
+        if (!fijado) return this.marcadorEnVista();
+
+        if (this.desvaneciendo()) {
+            return { ...fijado, escala: 1, opacidad: 0, isOpen: false };
         }
 
-        const columnas = Math.min(total, 3);
-        const filas = Math.ceil(total / columnas);
-        const fila = Math.floor(indice / columnas);
-        const columna = indice % columnas;
-
-        const margenHorizontal = 20;
-        const margenVertical = 25;
-        const anchoUtil = 100 - margenHorizontal * 2;
-        const altoUtil = 100 - margenVertical * 2;
-
-        const espacioX = columnas > 1 ? anchoUtil / (columnas - 1) : 0;
-        const espacioY = filas > 1 ? altoUtil / (filas - 1) : 0;
-
-        return {
-            x: margenHorizontal + columna * espacioX,
-            y: margenVertical + fila * espacioY
-        };
-    }
+        return { ...fijado, escala: 1, opacidad: 1, isOpen: true };
+    });
 
     /**
-     * Formatea la distancia para mostrar en pantalla.
+     * Reproduce un archivo de audio real cuando se abre el libro.
      */
-    protected formatearDistancia(distancia: number): string {
-        if (distancia < 1000) {
-            return `${Math.round(distancia)}m`;
-        }
-        return `${(distancia / 1000).toFixed(1)}km`;
+    #reproducirSonidoApertura(): void {
+        console.log("¡SONIDO HISTÓRICO REPRODUCIDO DESDE ARCHIVO!");
+        const audio = new Audio('assets/lesiakower-ancient-lyre-sound-short-arpeggio-sound-effect-430628.mp3');
+        audio.play().catch(e => console.warn('El navegador bloqueó el autoplay del sonido.', e));
     }
 
-    /**
-     * TrackBy para el @for de Angular.
-     */
-    protected trackPorId(_indice: number, poi: PoiView): string {
-        return poi.id;
+    dejarFirma(nombre: string): void {
+        if (!nombre.trim()) return;
+        this.firmaActual.set(nombre);
+        this.haFirmado.set(true);
+
+        // Muestra la firma durante 2.5 segundos, luego activa el cierre suave
+        setTimeout(() => {
+            this.desvaneciendo.set(true);
+
+            // Tras 1 segundo (lo que dura la transición CSS de cerrado), reseteamos todo el componente
+            setTimeout(() => {
+                this.marcadorFijado.set(null);
+                this.desvaneciendo.set(false);
+                this.haFirmado.set(false);
+                this.firmaActual.set('');
+            }, 1000);
+        }, 2500);
     }
 }

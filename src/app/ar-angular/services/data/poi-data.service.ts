@@ -13,7 +13,7 @@ import { ArStateService } from '../state/ar-state.service';
 @Injectable({ providedIn: 'root' })
 export class PoiService {
     // Radio de visión en metros. Los POIs más lejanos no se mostrarán.
-    private readonly VISIBLE_RADIUS = 500;
+    private readonly VISIBLE_RADIUS = 25;
     private readonly state = inject(ArStateService);
 
     /**

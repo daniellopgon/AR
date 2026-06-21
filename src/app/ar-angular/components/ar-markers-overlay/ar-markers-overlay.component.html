@@ -1,21 +1,31 @@
-<div class="markers-container">
-    @for (marcador of marcadoresVisibles(); track marcador.id) {
-        <div class="marker-wrapper"
-             [style.left.%]="marcador.posicionPantalla.x"
-             [style.top.%]="marcador.posicionPantalla.y"
-             [style.transform]="'translate(-50%, -50%) scale(' + marcador.escala + ')'"
-             [style.opacity]="marcador.opacidad">
+@if (marcadorCercano(); as marcador) {
+<div class="marker-centrado" [style.transform]="'scale(' + marcador.escala + ')'" [style.opacity]="marcador.opacidad">
 
-            <div class="marker-card">
-                <img class="marker-icon"
-                     src="assets/marcador.png"
-                     alt="Marcador de {{ marcador.label }}" />
-
-                <div class="marker-info">
-                    <span class="marker-name">{{ marcador.label }}</span>
-                    <span class="marker-distance">{{ formatearDistancia(marcador.distance) }}</span>
+    <div class="floating-wrapper" [class.is-floating]="!marcador.isOpen">
+        <div class="card" [class.is-open]="marcador.isOpen">
+            <div class="imgBox">
+                <img src="assets/map_cover.png" alt="Portada Mapa Aventuras">
+                <div class="cover-title">
+                    <h3>Libro de Aventuras</h3>
+                    <p>{{ marcador.label }}</p>
                 </div>
+                <div class="bark"></div>
+            </div>
+
+            <div class="details">
+                @if (!haFirmado()) {
+                <h4 class="color1">Viajar siempre es</h4>
+                <h4 class="color2 margin">una gran aventura</h4>
+                <input type="text" placeholder="Tu nombre..." class="guestbook-input" #firmaInput>
+                <button class="guestbook-btn" (click)="dejarFirma(firmaInput.value)">Firmar</button>
+                } @else {
+                <h4 class="color1">¡Gracias por</h4>
+                <h4 class="color2 margin">tu firma!</h4>
+                <p class="guestbook-signature">{{ firmaActual() }}</p>
+                }
             </div>
         </div>
-    }
+    </div>
+
 </div>
+}
