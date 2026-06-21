@@ -1,3 +1,22 @@
+# Ar simulada
+Según las pruebas realizadas con el stack actual, no sé puede generar una realidad aumentada real. Por ello lo más similar es eliminar del todo la orientación y dejar solo geolocalización con coordenadas lat y long, para reducir el efecto de pegatina pegada en la pantalla he generado un efecto de aumento y reducción de tamaño según te alejas al punto exacto.
+
+Debido al accuracy del gps, el marcador sera visible a partir de los 25 metros y se ira incrementando o reduciendo segun te acerques al punto exacto que tiene un radio de unos 7 metros.
+Para darle coherencia en lugar de usar pines he creado una animaciñon de un libro de viajes con html y css, al acercarte al radio de 7 metros el libro se abre y te deja frimar.
+
+# ScreenShots
+
+<img width="227" height="407" alt="1" src="https://github.com/user-attachments/assets/1ac0c426-68f3-4232-b079-c8d0ac75b5f6" />
+
+<img width="227" height="392" alt="2" src="https://github.com/user-attachments/assets/dcd6ab73-0cee-4d10-8428-bb9bb9196438" />
+
+<img width="222" height="400" alt="3" src="https://github.com/user-attachments/assets/630178d4-81b6-45b5-b54a-649be3f9abf1" />
+
+<img width="227" height="412" alt="5" src="https://github.com/user-attachments/assets/86231d73-4247-4ec1-a38b-1bbf0894f3af" />
+
+<img width="226" height="391" alt="6" src="https://github.com/user-attachments/assets/b065d59e-d264-41af-b782-25b888b74d1e" />
+
+
 # Protocolo de Pruebas de Campo 
 Este documento recoge los resultados de las pruebas de campo para evaluar si la tecnología AR basada en GPS y brújula es viable en distintos entornos. No se necesitan conocimientos técnicos.
 
